@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "500m"
+spec:
+  rules:
+  - host: "{{ .Values.ingress.host }}"
+    http:
+      paths:
+      - backend:
+          serviceName: {{ include "sales-quick-quote-api.fullname" . }}
+          servicePort: {{ .Values.service.port }}
+        path: /

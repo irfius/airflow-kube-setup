@@ -1,0 +1,6 @@
+dependencies:
+    - name: postgres
+      version: 10.14
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      condition: postgres.enabled
+  

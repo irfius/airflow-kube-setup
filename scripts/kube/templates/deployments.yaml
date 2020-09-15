@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sales-quick-quote-api.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "sales-quick-quote-api.name" . }}
+    helm.sh/chart: {{ include "sales-quick-quote-api.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "sales-quick-quote-api.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      annotations:
+        ad.datadoghq.com/sales-quick-quote-api.logs: '[{"source":"{{ .Values.config.DD_SERVICE }}","service":"sales-quick-quote-api"}]'
+      labels:
+        app.kubernetes.io/name: {{ include "sales-quick-quote-api.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }} 
+          envFrom:
+            - configMapRef:
+                name: {{ include "sales-quick-quote-api.fullname" . }}
+
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_SERVICE_NAME
+              value: {{ include "sales-quick-quote-api.fullname" . }} 
+            - name: DD_LOGS_INJECTION
+              value: "true"
+            - name: DD_SERVICE
+              value: {{ .Values.config.DD_SERVICE }}
+            - name: DD_ENV
+              value: {{ .Values.config.DD_ENV }}
+            - name: DD_VERSION
+              value: "1.2.3"
+            - name: DATADOG_TRACE_ENABLED
+              value: "true"
+            - name: DD_POSTGRES_ANALYTICS_ENABLED
+              value: "true"
+            - name: DD_TRACE_ANALYTICS_ENABLED
+              value: "true"
+            - name: DD_BOTO_ANALYTICS_ENABLED
+              value: "true"
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          #livenessProbe:
+          #  httpGet:
+          #    path: /
+          #    port: http
+          #readinessProbe:
+          #  httpGet:
+          #    path: /
+          #    port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
