@@ -15,7 +15,7 @@
 #  specific language governing permissions and limitations      *
 #  under the License.                                           *
 
-FROM python:3.6-slim
+FROM python:3.8.5-slim-buster
 
 # install deps
 RUN apt-get update -y && apt-get install -y \
@@ -26,11 +26,10 @@ RUN apt-get update -y && apt-get install -y \
     gcc \
     && apt-get clean
 
-RUN pip install --upgrade pip
+COPY requirements.txt /requirements.txt
 
-RUN pip install apache-airflow==1.10.10
-RUN pip install 'apache-airflow[kubernetes]'
-RUN pip install 'apache-airflow[postgres]'
+RUN pip install --upgrade pip && \
+    pip install -r /requirements.txt
 
 COPY airflow-test-env-init.sh /tmp/airflow-test-env-init.sh
 
