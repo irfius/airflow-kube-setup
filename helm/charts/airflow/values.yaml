@@ -12,9 +12,6 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: 1.10.12
 
-secrets: 
-  sql_alchemy_conn: cG9zdGdyZXNxbCtwc3ljb3BnMjovL3Jvb3Q6cm9vdEBwb3N0Z3Jlcy1haXJmbG93OjU0MzIvYWlyZmxvdwo
-
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
@@ -42,8 +39,8 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: ClusterIP
-  port: 80
+  type: LoadBalancer
+  port: 8080
 
 ingress:
   enabled: false
