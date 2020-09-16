@@ -6,10 +6,14 @@ replicaCount: 1
 
 
 image:
-  repository: nginx
+  name: airflow
+  # repository: 
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: 1.10.12
+
+secrets: 
+  sql_alchemy_conn: cG9zdGdyZXNxbCtwc3ljb3BnMjovL3Jvb3Q6cm9vdEBwb3N0Z3Jlcy1haXJmbG93OjU0MzIvYWlyZmxvdwo
 
 imagePullSecrets: []
 nameOverride: ""

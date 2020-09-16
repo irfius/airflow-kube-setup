@@ -19,8 +19,8 @@
 
 set -x
 
-AIRFLOW_IMAGE=$IMAGE
-AIRFLOW_TAG=0.0.1
+AIRFLOW_IMAGE=airflow
+AIRFLOW_TAG=1.10.12
 DIRNAME=$(cd "$(dirname "$0")"; pwd)
 TEMPLATE_DIRNAME=${DIRNAME}/templates
 BUILD_DIRNAME=${DIRNAME}/build
@@ -143,17 +143,17 @@ if [[ "${TRAVIS}" == true ]]; then
   sudo chown -R travis.travis $HOME/.kube $HOME/.minikube
 fi
 
-kubectl delete -f $DIRNAME/postgres.yaml
-kubectl delete -f $BUILD_DIRNAME/airflow.yaml
-kubectl delete -f $DIRNAME/secrets.yaml
+kubectl delete -f $DIRNAME/postgres.yaml 
+kubectl delete -f $BUILD_DIRNAME/airflow.yaml 
+kubectl delete -f $DIRNAME/secrets.yaml 
 
 set -e
 
-kubectl apply -f $DIRNAME/secrets.yaml
-kubectl apply -f $BUILD_DIRNAME/configmaps.yaml
-kubectl apply -f $DIRNAME/postgres.yaml
-kubectl apply -f $DIRNAME/volumes.yaml
-kubectl apply -f $BUILD_DIRNAME/airflow.yaml
+kubectl apply -f $DIRNAME/secrets.yaml 
+kubectl apply -f $BUILD_DIRNAME/configmaps.yaml 
+kubectl apply -f $DIRNAME/postgres.yaml 
+kubectl apply -f $DIRNAME/volumes.yaml 
+kubectl apply -f $BUILD_DIRNAME/airflow.yaml --validate=false
 
 # wait for up to 10 minutes for everything to be deployed
 PODS_ARE_READY=0
