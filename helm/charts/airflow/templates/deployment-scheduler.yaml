@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "airflow.fullname" . }}
+  name: {{ include "airflow.fullname" . }}-scheduler
   labels:
     {{- include "airflow.labels" . | nindent 4 }}
 spec:
