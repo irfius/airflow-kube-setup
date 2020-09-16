@@ -1,6 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
-metadata:
+metadata: 
   name: {{ .Values.gitSync.name }}
   labels:
     {{- include "airflow.labels" . | nindent 4 }}
@@ -35,7 +35,7 @@ spec:
             runAsUser: 0
           volumeMounts:
             - mountPath: /git
-            name: airflow-dags-git
+              name: airflow-dags-git
           env:
             - name: GIT_SYNC_REPO
               value: {{ .Values.gitSync.syncRepo }}
