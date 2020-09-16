@@ -4,7 +4,6 @@
 
 replicaCount: 1
 
-
 image:
   name: airflow
   # repository: 
