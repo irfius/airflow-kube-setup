@@ -11,13 +11,18 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: 1.10.12
 
-gitSync:
-  name: git-sync-clone
-  syncRepo: https://github.com/example.git
-  syncBranch: /my-branch
-  syncRoot: /git
-  syncDest: repo
-  syncOneTime: "true"
+config:
+  gitSync:
+    syncRepo: https://github.com/example.git
+    syncBranch: /my-branch
+    syncRoot: /git
+    syncDest: repo
+    syncOneTime: "true"
+  postgres:
+    user: root
+    password: root
+    db: airflow
+    dataDir: /var/lib/postgresql/data/pgdata
 
 imagePullSecrets: []
 nameOverride: ""

@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: {{ include "airflow.fullname" . }}-postgres
+  labels:
+    {{- include "airflow.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "airflow.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "airflow.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "airflow.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: postgres
+          image: postgres:10.14
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          volumeMounts:
+            - name: pg-data
+              mountPath: /var/lib/postgresql/data/pgdata
+              subPath: pgdata
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.config.postgres.user }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.config.postgres.password }}
+            - name: POSTGRES_DB
+              value: {{ .Values.config.postgres.db }}
+            - name: PGDATA
+              value: {{ .Values.config.postgres.dataDir }}
+            - name: POD_IP
+              valueFrom: { fieldRef: { fieldPath: status.podIP } }
+          livenessProbe:
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 5
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - exec pg_isready --host $POD_IP ||  if [[ $(psql -qtAc --host $POD_IP 'SELECT pg_is_in_recovery') != "f" ]]; then  exit 0 else; exit 1; fi
+          readinessProbe:
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+            periodSeconds: 5
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - exec pg_isready --host $POD_IP
+      volumes:
+        - name: pg-data
+          persistentVolumeClaim:
+            claimName: pg-data
+        - name: configmap
+          configMap:
+            name: configmap
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
