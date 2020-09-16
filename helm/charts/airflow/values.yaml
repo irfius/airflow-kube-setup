@@ -12,6 +12,14 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: 1.10.12
 
+gitSync:
+  name: git-sync-clone
+  syncRepo: https://github.com/example.git
+  syncBranch: /my-branch
+  syncRoot: /git
+  syncDest: repo
+  syncOneTime: "true"
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
